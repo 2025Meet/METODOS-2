@@ -1,0 +1,15 @@
+import numpy as np
+import matplotlib.pyplot as plt
+def f(x):
+    return np.exp(x**2)
+def F(x):
+    return 1+x**2+x**4/2
+def s(x):
+    return np.sin(x)
+f(8)
+F(1)
+s(1)
+xx=np.linspace(0.0,2.0,10000)
+plt.plot(xx,f(xx))
+plt.plot(xx,F(xx))
+plt.plot(xx,s(xx))
