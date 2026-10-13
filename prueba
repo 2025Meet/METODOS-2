@@ -1,0 +1,70 @@
+import math
+
+def cuadratura_adaptable(f, a, b, TOL, N):
+    """
+    Cuadratura adaptable mediante la regla de Simpson.
+
+    f   : función a integrar
+    a,b : extremos del intervalo
+    TOL : tolerancia del error
+    N   : nivel máximo de subdivisión
+    """
+
+    # Paso 1. Inicialización
+    h = (b - a) / 2
+    FA = f(a)
+    FC = f(a + h)
+    FB = f(b)
+
+    S = h * (FA + 4*FC + FB) / 3
+
+    # Cada elemento contiene:
+    # a, h, TOL, S, nivel, FA, FC, FB
+    pila = [(a, h, TOL, S, 1, FA, FC, FB)]
+
+    APP = 0
+    evaluaciones = 3
+    subdivisiones = 0
+
+    while pila:
+
+        # Extraer los datos del subintervalo
+        ai, hi, TOLi, Si, nivel, FAi, FCi, FBi = pila.pop()
+
+        # Paso 3. Evaluar los nuevos puntos
+        FD = f(ai + hi/2)
+        FE = f(ai + 3*hi/2)
+        evaluaciones += 2
+
+        # Aproximaciones de Simpson para ambas mitades
+        S1 = hi * (FAi + 4*FD + FCi) / 6
+        S2 = hi * (FCi + 4*FE + FBi) / 6
+
+        # Paso 5. Comprobar la tolerancia
+        if abs(S1 + S2 - Si) < TOLi:
+
+            APP += S1 + S2
+
+        else:
+
+            # Comprobar el nivel máximo
+            if nivel >= N:
+                raise RuntimeError(
+                    "NIVEL EXCEDIDO: no se alcanzó la tolerancia."
+                )
+
+            # Subintervalo derecho
+            pila.append((
+                ai + hi, hi/2, TOLi/2, S2,
+                nivel + 1, FCi, FE, FBi
+            ))
+
+            # Subintervalo izquierdo
+            pila.append((
+                ai, hi/2, TOLi/2, S1,
+                nivel + 1, FAi, FD, FCi
+            ))
+
+            subdivisiones += 1
+
+    return APP, evaluaciones, subdivisiones
